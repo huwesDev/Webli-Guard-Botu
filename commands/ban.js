@@ -2,16 +2,43 @@ const {
   SlashCommandBuilder,
   PermissionFlagsBits,
   ContainerBuilder,
-  SectionBuilder,
-  TextDisplayBuilder,
-  MediaGalleryBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
   MessageFlags,
 } = require('discord.js');
 const { addCeza, addLog } = require('../utils/db');
-const { COLOR, sep, txt, footer, timestamp } = require('../utils/cv2');
+const { COLOR, sep, txt, timestamp } = require('../utils/cv2');
+
+function errContainer(msg) {
+  return new ContainerBuilder().setAccentColor(COLOR.danger)
+    .addTextDisplayComponents(txt(`### ❌  Hata\n> ${msg}`));
+}
+
+function dmContainer(guildName, tip, sebep, modTag) {
+  const titles = { ban: '🔨 Yasaklandınız', kick: '👢 Atıldınız', mute: '🔇 Susturuldunuz' };
+  return new ContainerBuilder().setAccentColor(COLOR.danger)
+    .addTextDisplayComponents(txt(`### ${titles[tip] || '⚠️ Ceza Aldınız'}`))
+    .addSeparatorComponents(sep())
+    .addTextDisplayComponents(
+      txt(`**Sunucu:** ${guildName}\n**Sebep:** ${sebep}\n**Yetkili:** ${modTag}`),
+      txt(`-# ${timestamp()}`),
+    );
+}
+
+function modAction(title, color, target, mod, sebep, extra = []) {
+  const lines = [
+    `**Kullanıcı:** ${target.tag} \`(${target.id})\``,
+    `**Yetkili:** ${mod.tag}`,
+    `**Sebep:** ${sebep}`,
+    ...extra.map(([k, v]) => `**${k}:** ${v}`),
+  ].join('\n');
+
+  return new ContainerBuilder().setAccentColor(color)
+    .addTextDisplayComponents(txt(`### ${title}`))
+    .addSeparatorComponents(sep())
+    .addTextDisplayComponents(
+      txt(lines),
+      txt(`-# ${timestamp()}`),
+    );
+}
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -39,7 +66,7 @@ module.exports = {
     try {
       await user.send({
         flags: MessageFlags.IsComponentsV2,
-        components: [dmContainer(interaction.guild.name, interaction.guild.iconURL(), 'ban', sebep, interaction.user.tag)],
+        components: [dmContainer(interaction.guild.name, 'ban', sebep, interaction.user.tag)],
       }).catch(() => {});
 
       await interaction.guild.members.ban(user.id, {
@@ -53,49 +80,15 @@ module.exports = {
 
       await interaction.reply({
         flags: MessageFlags.IsComponentsV2,
-        components: [modAction('🔨  Kullanıcı Banlandı', COLOR.danger,
-          user, interaction.user, sebep,
-          [['Mesaj Silme', silGun > 0 ? `${silGun} gün` : 'Yok']]
-        )],
+        components: [modAction('🔨  Kullanıcı Banlandı', COLOR.danger, user, interaction.user, sebep,
+          [['Mesaj Silme', silGun > 0 ? `${silGun} gün` : 'Yok']])],
       });
     } catch (e) {
       await interaction.reply({ flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral, components: [errContainer(`Ban başarısız: ${e.message}`)] });
     }
   },
+
+  errContainer,
+  dmContainer,
+  modAction,
 };
-
-function errContainer(msg) {
-  return new ContainerBuilder().setAccentColor(COLOR.danger)
-    .addTextDisplayComponents(txt(`### ❌  Hata\n> ${msg}`));
-}
-
-function dmContainer(guildName, guildIcon, tip, sebep, mod) {
-  const titles = { ban: '🔨 Yasaklandınız', kick: '👢 Atıldınız', mute: '🔇 Susturuldunuz' };
-  return new ContainerBuilder().setAccentColor(COLOR.danger)
-    .addTextDisplayComponents(
-      txt(`### ${titles[tip] || '⚠️ Ceza Aldınız'}`),
-      txt(`**Sunucu:** ${guildName}\n**Sebep:** ${sebep}\n**Yetkili:** ${mod}`),
-      txt(`-# ${timestamp()}`),
-    );
-}
-
-function modAction(title, color, target, mod, sebep, extra = []) {
-  const fields = [
-    `**Kullanıcı:** ${target.tag} \`(${target.id})\``,
-    `**Yetkili:** ${mod.tag}`,
-    `**Sebep:** ${sebep}`,
-    ...extra.map(([k, v]) => `**${k}:** ${v}`),
-  ].join('\n');
-
-  return new ContainerBuilder().setAccentColor(color)
-    .addTextDisplayComponents(
-      txt(`### ${title}`),
-      sep(),
-      txt(fields),
-      txt(`-# ${timestamp()}`),
-    );
-}
-
-module.exports.dmContainer  = dmContainer;
-module.exports.errContainer = errContainer;
-module.exports.modAction    = modAction;
