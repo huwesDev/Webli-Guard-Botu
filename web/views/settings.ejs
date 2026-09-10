@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Koruma Ayarları — huw3s Guard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<%- include('partials/navbar') %>
+<div class="page-wrap">
+  <%- include('partials/sidebar', { active: 'settings' }) %>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <main class="dash-main">
+
+    <% if (saved == '1') { %>
+      <div class="alert alert-success">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Ayarlar başarıyla kaydedildi.
+      </div>
+    <% } %>
+
+    <div class="page-header">
+      <div class="page-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--p2)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Koruma Ayarları
+      </div>
+      <div class="page-sub">Tüm guard modüllerini ve gelişmiş ayarları yönet</div>
+    </div>
+
+    <form action="/settings" method="POST" id="settingsForm">
+
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Sunucu Koruması
+          <span class="badge badge-primary" style="margin-left:auto">
+            <%= [['guard_rol'],['guard_kanal'],['guard_channel_update'],['guard_sunucu'],['guard_perm'],['guard_emoji'],['guard_sticker']].filter(([k])=>settings[k]).length %>/7
+          </span>
+        </div>
+        <div class="toggles-grid">
+          <% [
+            ['guard_rol',           'Rol Koruması',       '#7c6bff'],
+            ['guard_kanal',         'Kanal Koruması',     '#22e5ff'],
+            ['guard_channel_update','Kanal Rename Guard', '#22e5ff'],
+            ['guard_sunucu',        'Sunucu Koruması',    '#c26bff'],
+            ['guard_perm',          'İzin Koruması',      '#862e9c'],
+            ['guard_emoji',         'Emoji Koruması',     '#ffd022'],
+            ['guard_sticker',       'Sticker Koruması',   '#ff7733'],
+          ].forEach(([key, label, color]) => { %>
+            <div class="toggle-card">
+              <div class="toggle-card-label">
+                <span class="toggle-dot" style="background:<%= color %>"></span>
+                <%= label %>
+              </div>
+              <label class="switch">
+                <input type="checkbox" name="<%= key %>" <%= settings[key] ? 'checked' : '' %>>
+                <span class="slider"></span>
+              </label>
+            </div>
+          <% }); %>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Kullanıcı &amp; Üye Koruması
+          <span class="badge badge-danger" style="margin-left:auto">
+            <%= [['guard_bot'],['guard_webhook'],['guard_everyone'],['guard_davet'],['guard_link'],['guard_raid'],['guard_hesap_yasi'],['guard_mass'],['guard_channel_create'],['guard_role_create']].filter(([k])=>settings[k]).length %>/10
+          </span>
+        </div>
+        <div class="toggles-grid">
+          <% [
+            ['guard_bot',            'Bot Koruması',        '#ff3355'],
+            ['guard_webhook',        'Webhook Koruması',    '#22ff88'],
+            ['guard_everyone',       '@everyone Koruması',  '#ff3355'],
+            ['guard_davet',          'Davet Koruması',      '#22e5ff'],
+            ['guard_link',           'Link Filtresi',       '#ff7733'],
+            ['guard_raid',           'Raid Koruması',       '#ff3355'],
+            ['guard_hesap_yasi',     'Hesap Yaşı',          '#7c6bff'],
+            ['guard_mass',           'Mass Action Guard',   '#ff3355'],
+            ['guard_channel_create', 'Kanal Spam Guard',    '#22e5ff'],
+            ['guard_role_create',    'Rol Spam Guard',      '#c26bff'],
+          ].forEach(([key, label, color]) => { %>
+            <div class="toggle-card">
+              <div class="toggle-card-label">
+                <span class="toggle-dot" style="background:<%= color %>"></span>
+                <%= label %>
+              </div>
+              <label class="switch">
+                <input type="checkbox" name="<%= key %>" <%= settings[key] ? 'checked' : '' %>>
+                <span class="slider"></span>
+              </label>
+            </div>
+          <% }); %>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Mesaj Koruması
+          <span class="badge badge-warn" style="margin-left:auto">
+            <%= [['guard_spam'],['guard_mention'],['guard_caps'],['guard_slowmode'],['guard_wordfilter']].filter(([k])=>settings[k]).length %>/5
+          </span>
+        </div>
+        <div class="toggles-grid">
+          <% [
+            ['guard_spam',       'Spam Guard',      '#ffd022'],
+            ['guard_mention',    'Mention Guard',   '#ff3355'],
+            ['guard_caps',       'Caps Guard',      '#c26bff'],
+            ['guard_slowmode',   'Auto Slowmode',   '#22e5ff'],
+            ['guard_wordfilter', 'Kelime Filtresi', '#ff7733'],
+          ].forEach(([key, label, color]) => { %>
+            <div class="toggle-card">
+              <div class="toggle-card-label">
+                <span class="toggle-dot" style="background:<%= color %>"></span>
+                <%= label %>
+              </div>
+              <label class="switch">
+                <input type="checkbox" name="<%= key %>" <%= settings[key] ? 'checked' : '' %>>
+                <span class="slider"></span>
+              </label>
+            </div>
+          <% }); %>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+          Genel Ayarlar
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Log Kanalı</label>
+            <select name="log_channel" class="form-control">
+              <option value="">— Seçiniz —</option>
+              <% for (const ch of channels) { %>
+                <option value="<%= ch.id %>" <%= settings.log_channel === ch.id ? 'selected' : '' %>># <%= ch.name %></option>
+              <% } %>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jail Rolü</label>
+            <select name="jail_role" class="form-control">
+              <option value="">— Seçiniz —</option>
+              <% for (const r of roles) { %>
+                <option value="<%= r.id %>" <%= settings.jail_role === r.id ? 'selected' : '' %>><%= r.name %></option>
+              <% } %>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Varsayılan Ceza</label>
+            <select name="ceza_tip" class="form-control">
+              <option value="jail" <%= settings.ceza_tip === 'jail' ? 'selected' : '' %>>Jail</option>
+              <option value="kick" <%= settings.ceza_tip === 'kick' ? 'selected' : '' %>>Kick</option>
+              <option value="ban"  <%= settings.ceza_tip === 'ban'  ? 'selected' : '' %>>Ban</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Gelişmiş Eşikler
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Min. Hesap Yaşı (gün)</label>
+            <input type="number" name="min_account_age" class="form-control" value="<%= settings.min_account_age || 0 %>" min="0" max="365">
+            <div class="form-hint">Bu yaşın altındaki hesaplar sunucuya katılamaz.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Raid Eşiği (kişi)</label>
+            <input type="number" name="raid_threshold" class="form-control" value="<%= settings.raid_threshold || 5 %>" min="2" max="50">
+            <div class="form-hint">Belirlenen sürede bu kadar katılım olursa raid algılanır.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Raid Aralığı (sn)</label>
+            <input type="number" name="raid_interval" class="form-control" value="<%= settings.raid_interval || 10 %>" min="5" max="60">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Slowmode Eşiği (msg/5s)</label>
+            <input type="number" name="slowmode_threshold" class="form-control" value="<%= settings.slowmode_threshold || 8 %>" min="3" max="30">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Slowmode Süresi (sn)</label>
+            <input type="number" name="slowmode_seconds" class="form-control" value="<%= settings.slowmode_seconds || 10 %>" min="1" max="120">
+          </div>
+        </div>
+        <div class="grad-divider"></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Link Whitelist (virgülle)</label>
+            <input type="text" name="link_whitelist" class="form-control" value="<%= settings.link_whitelist || '' %>" placeholder="youtube.com, twitch.tv">
+            <div class="form-hint">Bu domainlerden gelen linkler silinmez.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Yasaklı Kelimeler (virgülle)</label>
+            <input type="text" name="banned_words" class="form-control" value="<%= settings.banned_words || '' %>" placeholder="kelime1, kelime2">
+            <div class="form-hint">Kelime filtresi aktifken bu kelimeleri içeren mesajlar silinir.</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center;padding-top:4px">
+        <button type="submit" class="btn btn-primary" id="saveBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+          Kaydet
+        </button>
+        <a href="/dashboard" class="btn btn-ghost">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Dashboard
+        </a>
+      </div>
+
+    </form>
+  </main>
+</div>
+
+<script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav?.classList.toggle('scrolled', scrollY > 10), { passive: true });
+
+const overlay = document.getElementById('sidebarOverlay');
+const sidebar = document.getElementById('sidebar');
+document.getElementById('navMenuBtn')?.addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('show');
+});
+overlay?.addEventListener('click', () => {
+  sidebar.classList.remove('open');
+  overlay.classList.remove('show');
+});
+
+document.getElementById('settingsForm')?.addEventListener('submit', () => {
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  btn.textContent = 'Kaydediliyor…';
+});
+</script>
+</body>
+</html>

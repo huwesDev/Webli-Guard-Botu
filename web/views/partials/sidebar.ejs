@@ -1,0 +1,96 @@
+<aside class="sidebar" id="sidebar">
+
+  <div class="sidebar-label">Genel</div>
+
+  <a href="/dashboard" class="sidebar-item <%= active === 'dashboard' ? 'active' : '' %>">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+      <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+    </svg>
+    Genel Bakış
+  </a>
+
+  <a href="/logs" class="sidebar-item <%= active === 'logs' ? 'active' : '' %>">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="16" y1="13" x2="8" y2="13"/>
+      <line x1="16" y1="17" x2="8" y2="17"/>
+    </svg>
+    Loglar
+  </a>
+
+  <div class="sidebar-label">Moderasyon</div>
+
+  <a href="/members" class="sidebar-item <%= active === 'members' ? 'active' : '' %>">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+    Üyeler
+  </a>
+
+  <a href="/cezalar" class="sidebar-item <%= active === 'cezalar' ? 'active' : '' %>">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/>
+      <line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+    Cezalar
+  </a>
+
+  <a href="/bans" class="sidebar-item <%= active === 'bans' ? 'active' : '' %>">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+    </svg>
+    Ban Listesi
+  </a>
+
+  <div class="sidebar-label">Yapılandırma</div>
+
+  <a href="/settings" class="sidebar-item <%= active === 'settings' ? 'active' : '' %>">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+    </svg>
+    Koruma Ayarları
+  </a>
+
+  <a href="/dashboard#whitelist" class="sidebar-item">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+    Whitelist
+  </a>
+
+  <a href="/dashboard#backup" class="sidebar-item">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="21 15 21 21 3 21 3 15"/>
+      <polyline points="7 10 12 15 17 10"/>
+      <line x1="12" y1="15" x2="12" y2="3"/>
+    </svg>
+    Yedekler
+  </a>
+
+  <div style="flex:1"></div>
+
+  <% if (typeof user !== 'undefined' && user) { %>
+    <% const av = user.avatar
+         ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+         : `https://cdn.discordapp.com/embed/avatars/0.png`; %>
+    <div class="sidebar-foot">
+      <img src="<%= av %>" alt="<%= user.username %>">
+      <div>
+        <div class="sf-name"><%= user.username %></div>
+        <div class="sf-role">Administrator</div>
+      </div>
+      <a href="/auth/logout" style="margin-left:auto;color:var(--text2);display:flex;align-items:center;" title="Çıkış">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </a>
+    </div>
+  <% } %>
+
+</aside>

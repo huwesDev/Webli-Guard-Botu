@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loglar — huw3s Guard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<%- include('partials/navbar') %>
+<div class="page-wrap">
+  <%- include('partials/sidebar', { active: 'logs' }) %>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <main class="dash-main">
+
+    <div class="page-header">
+      <div class="page-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--p2)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+        Sunucu Logları
+      </div>
+      <div class="page-sub">
+        Tüm guard ve aktivite kayıtları &nbsp;·&nbsp;
+        <span class="live-dot"></span>&nbsp;
+        <span id="refreshCountdown">30</span>s yenileme
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-card-icon indigo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9d8ffe" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+        </div>
+        <div><div class="stat-card-value"><%= stats.total %></div><div class="stat-card-label">Toplam</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon green">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22ff88" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div><div class="stat-card-value"><%= stats.bugun %></div><div class="stat-card-label">Bugün</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon cyan">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22e5ff" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div><div class="stat-card-value"><%= stats.hafta %></div><div class="stat-card-label">Bu Hafta</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon red">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff3355" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div><div class="stat-card-value"><%= stats.guard %></div><div class="stat-card-label">Guard</div></div>
+      </div>
+    </div>
+
+    <div class="log-filters">
+      <% [
+        ['',        'Tümü'],
+        ['guard',   'Guard'],
+        ['msg',     'Mesaj'],
+        ['member',  'Üye'],
+        ['role',    'Rol'],
+        ['voice',   'Ses'],
+        ['ban',     'Ban'],
+        ['raid',    'Raid'],
+        ['link',    'Link'],
+        ['warn',    'Uyarı'],
+        ['join',    'Katılım'],
+        ['leave',   'Ayrılma'],
+      ].forEach(([k, label]) => { %>
+        <a href="/logs<%= k ? '?kat=' + k : '' %>"
+           class="filter-pill <%= (!kategori && k === '') || kategori === k ? 'active' : '' %>">
+          <% if (k) { %><span class="log-cat log-cat-<%= k %>"><%= k.toUpperCase() %></span>&nbsp;<% } %>
+          <%= label %>
+        </a>
+      <% }); %>
+    </div>
+
+    <div class="dc">
+      <div class="dc-head">
+        <div class="dc-title">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <%= logs.length %> kayıt
+          <% if (kategori) { %><span class="badge badge-info" style="font-size:10px"><%= kategori.toUpperCase() %></span><% } %>
+        </div>
+        <% if (kategori) { %>
+          <a href="/logs" class="btn btn-ghost btn-sm">Filtreyi Kaldır</a>
+        <% } %>
+      </div>
+      <div class="dc-body" style="padding:8px 6px">
+        <% if (!logs.length) { %>
+          <div class="empty-state" style="padding:60px">
+            <div class="empty-state-icon">📋</div>
+            <div class="empty-state-text">
+              Log kaydı bulunamadı.
+              <% if (kategori) { %>&nbsp;<a href="/logs">Filtreyi kaldır</a><% } %>
+            </div>
+          </div>
+        <% } else { %>
+          <div class="log-stream" id="logStream">
+            <% for (const log of logs) { %>
+              <div class="log-item">
+                <div class="log-line" style="background:<%= log.renk || '#7c6bff' %>"></div>
+                <div class="log-body">
+                  <div class="log-title">
+                    <span class="log-cat log-cat-<%= log.kategori %>"><%= log.kategori.toUpperCase() %></span>
+                    <%= log.baslik %>
+                  </div>
+                  <% if (log.aciklama && log.aciklama.trim()) { %>
+                    <div class="log-desc"><%= log.aciklama.slice(0, 240) %></div>
+                  <% } %>
+                  <div class="log-meta">
+                    <% if (log.user_tag  && log.user_tag.trim())  { %><span>👤 <%= log.user_tag %></span><% } %>
+                    <% if (log.hedef_tag && log.hedef_tag.trim()) { %><span>→ <%= log.hedef_tag %></span><% } %>
+                    <span>🕐 <%= new Date(log.tarih).toLocaleString('tr-TR') %></span>
+                  </div>
+                </div>
+              </div>
+            <% } %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav?.classList.toggle('scrolled', scrollY > 10), { passive: true });
+
+const overlay = document.getElementById('sidebarOverlay');
+const sidebar = document.getElementById('sidebar');
+document.getElementById('navMenuBtn')?.addEventListener('click', () => {
+  sidebar.classList.toggle('open'); overlay.classList.toggle('show');
+});
+overlay?.addEventListener('click', () => {
+  sidebar.classList.remove('open'); overlay.classList.remove('show');
+});
+
+let remaining = 30;
+const cd = document.getElementById('refreshCountdown');
+setInterval(() => {
+  remaining--;
+  if (cd) cd.textContent = remaining;
+  if (remaining <= 0) {
+    remaining = 30;
+    fetch('/api/logs/recent').then(r => r.json()).then(logs => {
+      if (!new URLSearchParams(location.search).get('kat')) location.reload();
+    }).catch(() => {});
+  }
+}, 1000);
+</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Erişim Reddedildi — huw3s Guard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<%- include('partials/navbar') %>
+
+<div style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 64px);padding:40px;padding-top:100px">
+  <div class="reveal" style="text-align:center;max-width:460px;width:100%">
+
+    <div style="width:88px;height:88px;background:rgba(255,51,85,.08);border:1px solid rgba(255,51,85,.18);border-radius:24px;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;position:relative">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ff3355" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <div style="position:absolute;inset:-1px;border-radius:25px;background:rgba(255,51,85,.06);pointer-events:none"></div>
+    </div>
+
+    <h2 style="font-size:26px;font-weight:800;color:var(--white);margin-bottom:10px;letter-spacing:-.6px;font-family:'Space Grotesk',sans-serif">
+      Erişim Reddedildi
+    </h2>
+
+    <p style="color:var(--text2);margin-bottom:32px;line-height:1.72;font-size:14px">
+      <%= message %>
+    </p>
+
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <a href="/" class="btn btn-primary">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Ana Sayfa
+      </a>
+      <a href="/auth/login" class="btn btn-ghost">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Tekrar Giriş Yap
+      </a>
+    </div>
+
+    <p style="margin-top:28px;font-size:11px;color:var(--text2)">
+      Bu hatanın yanlış olduğunu düşünüyorsanız sunucu sahibiyle iletişime geçin.
+    </p>
+  </div>
+</div>
+
+<script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav?.classList.toggle('scrolled', scrollY > 10), { passive: true });
+
+document.querySelectorAll('.reveal').forEach(el => {
+  setTimeout(() => el.classList.add('visible'), 60);
+});
+</script>
+</body>
+</html>

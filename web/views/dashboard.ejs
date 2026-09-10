@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — huw3s Guard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="spotlight" id="spotlight"></div>
+<%- include('partials/navbar') %>
+<div class="page-wrap">
+  <%- include('partials/sidebar', { active: 'dashboard' }) %>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <main class="dash-main">
+
+    <% if (saved == '1') { %>
+      <div class="alert alert-success">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Ayarlar başarıyla kaydedildi.
+      </div>
+    <% } %>
+
+    <div class="welcome-card">
+      <div class="welcome-text">
+        <div class="title">
+          Merhaba, <span class="ag-text"><%= user.username %></span> 👋
+        </div>
+        <div class="sub">
+          <span class="live-dot pulse-ring"></span>
+          Sistem aktif &nbsp;·&nbsp;
+          <span id="wc-time" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--p2)"></span>
+        </div>
+      </div>
+      <% if (guild && guild.iconURL()) { %>
+        <img src="<%= guild.iconURL() %>" class="welcome-guild-img" alt="<%= guild.name %>" data-tip="<%= guild.name %>">
+      <% } %>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card-premium tilt">
+        <div class="stat-card-icon indigo">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#9d8ffe" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div>
+          <div class="stat-card-value"><%= guild ? guild.memberCount : 0 %></div>
+          <div class="stat-card-label">Toplam Üye</div>
+        </div>
+      </div>
+      <div class="stat-card-premium tilt">
+        <div class="stat-card-icon cyan">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#22e5ff" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div>
+          <div class="stat-card-value"><%= guild ? guild.channels.cache.size : '—' %></div>
+          <div class="stat-card-label">Kanal</div>
+        </div>
+      </div>
+      <div class="stat-card-premium tilt">
+        <div class="stat-card-icon purple">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#d99aff" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        </div>
+        <div>
+          <div class="stat-card-value"><%= guild ? guild.roles.cache.size : '—' %></div>
+          <div class="stat-card-label">Rol</div>
+        </div>
+      </div>
+      <div class="stat-card-premium tilt">
+        <div class="stat-card-icon green">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#22ff88" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div>
+          <div class="stat-card-value" id="stat-ping">—</div>
+          <div class="stat-card-label">Bot Ping</div>
+        </div>
+      </div>
+      <div class="stat-card-premium tilt">
+        <div class="stat-card-icon red">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#ff3355" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div>
+          <div class="stat-card-value"><%= logStats.guard %></div>
+          <div class="stat-card-label">Guard Olayı</div>
+        </div>
+      </div>
+      <div class="stat-card-premium tilt">
+        <div class="stat-card-icon orange">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#ff7733" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div>
+          <div class="stat-card-value"><%= logStats.total %></div>
+          <div class="stat-card-label">Toplam Log</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dc" style="margin-bottom:18px">
+      <div class="dc-head">
+        <div class="dc-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Hızlı İşlemler
+        </div>
+      </div>
+      <div class="dc-body" style="padding:16px 20px">
+        <div class="quick-actions">
+          <a href="/logs" class="qa-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+            Loglar
+          </a>
+          <a href="/cezalar" class="qa-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+            Cezalar
+          </a>
+          <a href="/bans" class="qa-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+            Banlar
+          </a>
+          <a href="/members" class="qa-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            Üyeler
+          </a>
+          <a href="/settings" class="qa-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+            Ayarlar
+          </a>
+          <a href="/dashboard#whitelist" class="qa-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Whitelist
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px">
+
+      <div class="dc gb-card">
+        <div class="dc-head">
+          <div class="dc-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Guard Durumu
+          </div>
+          <span style="font-size:11px;color:var(--text2)">
+            <%= Object.entries(settings).filter(([k,v]) => k.startsWith('guard_') && v).length %> aktif
+          </span>
+        </div>
+        <div class="dc-body">
+          <%
+            const guardModules = [
+              ['guard_rol','Rol'],['guard_kanal','Kanal'],['guard_sunucu','Sunucu'],
+              ['guard_perm','İzin'],['guard_emoji','Emoji'],['guard_sticker','Sticker'],
+              ['guard_bot','Bot'],['guard_webhook','Webhook'],['guard_everyone','@everyone'],
+              ['guard_davet','Davet'],['guard_link','Link'],['guard_raid','Raid'],
+              ['guard_spam','Spam'],['guard_mention','Mention'],['guard_caps','Caps'],
+              ['guard_slowmode','Slowmode'],['guard_mass','Mass'],['guard_wordfilter','Kelime'],
+            ];
+          %>
+          <div class="guard-status-grid">
+            <% for (const [key, label] of guardModules) { %>
+              <div class="gsg-item <%= settings[key] ? 'on' : 'off' %>" data-tip="<%= label %> Koruması <%= settings[key] ? 'Aktif' : 'Kapalı' %>">
+                <span class="gsg-dot"></span>
+                <%= label %>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <div class="dc gb-card">
+        <div class="dc-head">
+          <div class="dc-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Son Aktivite
+          </div>
+          <a href="/logs" style="font-size:12px;color:var(--p2);text-decoration:none;display:flex;align-items:center;gap:4px">
+            Tümü
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+        </div>
+        <div class="dc-body" id="activity-feed" style="padding:12px 20px">
+          <% if (sonCezalar && sonCezalar.length > 0) { %>
+            <% for (const c of sonCezalar) { %>
+              <div class="feed-item">
+                <span class="feed-dot <%= c.tip === 'ban' ? 'ban' : c.tip === 'jail' ? 'warn' : 'guard' %>"></span>
+                <div class="feed-content">
+                  <div class="feed-title">
+                    <span class="badge <%= c.tip === 'ban' ? 'badge-danger' : c.tip === 'jail' ? 'badge-warn' : 'badge-info' %>"><%= c.tip.toUpperCase() %></span>
+                    &nbsp;<code style="font-size:10.5px"><%= c.user_id %></code>
+                  </div>
+                  <div class="feed-meta"><%= c.sebep.slice(0, 52) %></div>
+                </div>
+                <span class="feed-time"><%= new Date(c.tarih).toLocaleTimeString('tr-TR') %></span>
+              </div>
+            <% } %>
+          <% } else { %>
+            <div class="empty-state" style="padding:32px">
+              <div class="empty-state-icon">✅</div>
+              <div class="empty-state-text">Yakın zamanda olay yok</div>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <div class="dc" id="koruma">
+      <div class="dc-head">
+        <div class="dc-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Koruma Modülleri
+        </div>
+        <a href="/settings" class="btn btn-ghost btn-sm">Gelişmiş Ayarlar →</a>
+      </div>
+      <div class="dc-body">
+        <form action="/dashboard/settings" method="POST" id="guardForm">
+          <%
+            const toggles = [
+              ['guard_rol','Rol Koruması','#7c6bff'],['guard_kanal','Kanal Koruması','#22e5ff'],
+              ['guard_channel_update','Kanal Rename','#22e5ff'],['guard_sunucu','Sunucu Koruması','#c26bff'],
+              ['guard_perm','İzin Koruması','#862e9c'],['guard_emoji','Emoji Koruması','#ffd022'],
+              ['guard_sticker','Sticker Koruması','#ff7733'],['guard_bot','Bot Koruması','#ff3355'],
+              ['guard_webhook','Webhook Koruması','#22ff88'],['guard_everyone','@everyone','#ff3355'],
+              ['guard_davet','Davet Koruması','#22e5ff'],['guard_link','Link Filtresi','#ff7733'],
+              ['guard_raid','Raid Koruması','#ff3355'],['guard_hesap_yasi','Hesap Yaşı','#7c6bff'],
+              ['guard_channel_create','Kanal Spam','#22e5ff'],['guard_role_create','Rol Spam','#c26bff'],
+              ['guard_spam','Spam Guard','#ffd022'],['guard_mention','Mention Guard','#ff3355'],
+              ['guard_caps','Caps Guard','#c26bff'],['guard_slowmode','Auto Slowmode','#22e5ff'],
+              ['guard_mass','Mass Action Guard','#ff3355'],['guard_wordfilter','Kelime Filtresi','#ff7733'],
+            ];
+          %>
+          <div class="toggles-grid" style="margin-bottom:22px">
+            <% for (const [key, label, color] of toggles) { %>
+              <div class="toggle-card">
+                <div class="toggle-card-label">
+                  <span class="toggle-dot" style="background:<%= color %>"></span>
+                  <%= label %>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" name="<%= key %>" <%= settings[key] ? 'checked' : '' %>>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            <% } %>
+          </div>
+
+          <div class="grad-divider"></div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Log Kanalı</label>
+              <select name="log_channel" class="form-control">
+                <option value="">— Seçiniz —</option>
+                <% for (const ch of channels) { %>
+                  <option value="<%= ch.id %>" <%= settings.log_channel === ch.id ? 'selected' : '' %>># <%= ch.name %></option>
+                <% } %>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Jail Rolü</label>
+              <select name="jail_role" class="form-control">
+                <option value="">— Seçiniz —</option>
+                <% for (const r of roles) { %>
+                  <option value="<%= r.id %>" <%= settings.jail_role === r.id ? 'selected' : '' %>><%= r.name %></option>
+                <% } %>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Ceza Tipi</label>
+              <select name="ceza_tip" class="form-control">
+                <option value="jail" <%= settings.ceza_tip === 'jail' ? 'selected' : '' %>>Jail</option>
+                <option value="kick" <%= settings.ceza_tip === 'kick' ? 'selected' : '' %>>Kick</option>
+                <option value="ban"  <%= settings.ceza_tip === 'ban'  ? 'selected' : '' %>>Ban</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Min. Hesap Yaşı (gün)</label>
+              <input type="number" name="min_account_age" class="form-control" value="<%= settings.min_account_age || 0 %>" min="0" max="365">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Raid Eşiği (kişi)</label>
+              <input type="number" name="raid_threshold" class="form-control" value="<%= settings.raid_threshold || 5 %>" min="2" max="50">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Link Whitelist</label>
+              <input type="text" name="link_whitelist" class="form-control" value="<%= settings.link_whitelist || '' %>" placeholder="youtube.com, twitch.tv">
+            </div>
+          </div>
+          <div class="form-group" style="max-width:500px">
+            <label class="form-label">Yasaklı Kelimeler (virgülle)</label>
+            <input type="text" name="banned_words" class="form-control" value="<%= settings.banned_words || '' %>" placeholder="kelime1, kelime2">
+          </div>
+
+          <div style="display:flex;gap:10px;align-items:center;padding-top:4px">
+            <button type="submit" class="btn btn-primary" id="saveBtn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+              Kaydet
+            </button>
+            <span id="saveFeedback" style="font-size:12px;color:var(--green);display:none">✓ Kaydedildi</span>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="dc" id="whitelist">
+      <div class="dc-head">
+        <div class="dc-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Whitelist
+        </div>
+        <span class="badge badge-info"><%= whitelist.length %> kullanıcı</span>
+      </div>
+      <div class="dc-body">
+        <div class="whitelist-add-wrap">
+          <div class="user-preview" id="userPreview">
+            <img id="previewAvatar" src="" alt="">
+            <div class="user-preview-info">
+              <span class="u-tag" id="previewTag"></span>
+              <span class="u-code" id="previewId"></span>
+            </div>
+            <span class="badge badge-success" style="margin-left:auto">Bulundu ✓</span>
+          </div>
+          <div id="wlError" style="display:none;font-size:12px;color:var(--red);margin-bottom:8px"></div>
+          <form action="/dashboard/whitelist/add" method="POST" class="inline-form">
+            <input type="text" name="userId" id="wlInput" class="form-control" placeholder="Discord Kullanıcı ID..." autocomplete="off">
+            <button type="submit" class="btn btn-primary" id="wlBtn" disabled>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Ekle
+            </button>
+          </form>
+        </div>
+
+        <div class="card-list">
+          <% if (!whitelist.length) { %>
+            <div class="empty-state"><div class="empty-state-icon">✓</div><div class="empty-state-text">Whitelist boş.</div></div>
+          <% } %>
+          <% for (const w of whitelist) { %>
+            <div class="list-card">
+              <div class="list-card-avatar">
+                <% if (w.avatar) { %><img src="<%= w.avatar %>" alt=""><% } else { %><%= (w.username || '?')[0].toUpperCase() %><% } %>
+              </div>
+              <div class="list-card-body">
+                <div class="list-card-title"><%= w.username || 'Bilinmiyor' %></div>
+                <div class="list-card-sub"><%= w.tag || w.user_id %> · <code><%= w.user_id %></code></div>
+              </div>
+              <form action="/dashboard/whitelist/remove" method="POST">
+                <input type="hidden" name="userId" value="<%= w.user_id %>">
+                <button type="submit" class="btn btn-danger btn-sm">Kaldır</button>
+              </form>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+
+      <div class="dc" id="backup">
+        <div class="dc-head">
+          <div class="dc-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 15 21 21 3 21 3 15"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Yedekler
+          </div>
+          <span class="badge badge-purple"><%= backups.length %></span>
+        </div>
+        <div class="dc-body">
+          <p style="font-size:12px;color:var(--text2);margin-bottom:13px">
+            Oluşturmak için: <code>/backup create</code>
+          </p>
+          <div class="card-list">
+            <% if (!backups.length) { %>
+              <div class="empty-state" style="padding:24px">
+                <div class="empty-state-icon">📦</div>
+                <div class="empty-state-text">Yedek yok</div>
+              </div>
+            <% } %>
+            <% for (const b of backups) { %>
+              <div class="list-card">
+                <div class="list-card-avatar" style="background:rgba(194,107,255,.1);color:#d99aff">↓</div>
+                <div class="list-card-body">
+                  <div class="list-card-title"><%= b.isim %></div>
+                  <div class="list-card-sub"><code><%= b.id %></code></div>
+                </div>
+                <form action="/dashboard/backup/delete" method="POST">
+                  <input type="hidden" name="id" value="<%= b.id %>">
+                  <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+                </form>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <div class="dc" id="otorol">
+        <div class="dc-head">
+          <div class="dc-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+            Otorol & İstatistik
+          </div>
+        </div>
+        <div class="dc-body">
+          <div class="list-card" style="margin-bottom:16px">
+            <div class="list-card-avatar" style="background:rgba(34,229,255,.08);color:#22e5ff">⚙</div>
+            <div class="list-card-body">
+              <div class="list-card-title">
+                <% if (otorol) { %>
+                  <span class="badge badge-success">Aktif</span>&nbsp;<code><%= otorol.rol_id %></code>
+                <% } else { %>
+                  <span class="badge badge-gray">Ayarlanmamış</span>
+                <% } %>
+              </div>
+              <div class="list-card-sub">Değiştirmek için: /otorol ayarla</div>
+            </div>
+          </div>
+
+          <div style="padding-top:14px;border-top:1px solid var(--border)">
+            <div style="font-size:10px;color:var(--text2);margin-bottom:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.3px">Bugünkü İstatistikler</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center">
+              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--rl);padding:14px 8px">
+                <div style="font-size:22px;font-weight:800;color:var(--white);letter-spacing:-1px"><%= logStats.bugun %></div>
+                <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-top:3px">Log</div>
+              </div>
+              <div style="background:rgba(255,51,85,.06);border:1px solid rgba(255,51,85,.12);border-radius:var(--rl);padding:14px 8px">
+                <div style="font-size:22px;font-weight:800;color:var(--red);letter-spacing:-1px"><%= logStats.guard %></div>
+                <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-top:3px">Guard</div>
+              </div>
+              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--rl);padding:14px 8px">
+                <div style="font-size:22px;font-weight:800;color:var(--white);letter-spacing:-1px"><%= logStats.hafta %></div>
+                <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-top:3px">Haftalık</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="dc" style="border-color:rgba(255,51,85,.18)">
+      <div class="dc-head">
+        <div class="dc-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff3355" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
+          <span style="color:var(--red)">Veritabanını Sıfırla</span>
+        </div>
+        <span class="badge badge-danger">Tehlikeli</span>
+      </div>
+      <div class="dc-body" style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:13px;color:var(--text);margin-bottom:4px;font-weight:500">
+            Tüm loglar, cezalar, uyarılar, whitelist ve yedekler silinir. Guard ayarları varsayılana döner.
+          </div>
+          <div style="font-size:11px;color:var(--text2)">Bu işlem geri alınamaz. Bot üzerinden <code>/db-reset</code> komutuyla da yapılabilir.</div>
+        </div>
+        <button class="btn btn-danger" id="dbResetBtn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
+          Sıfırla
+        </button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const spot = document.getElementById('spotlight');
+document.addEventListener('mousemove', e => {
+  spot.style.left = e.clientX + 'px';
+  spot.style.top  = e.clientY + 'px';
+}, { passive: true });
+
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav?.classList.toggle('scrolled', scrollY > 10), { passive: true });
+
+const overlay = document.getElementById('sidebarOverlay');
+const sidebar = document.getElementById('sidebar');
+document.getElementById('navMenuBtn')?.addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('show');
+});
+overlay?.addEventListener('click', () => {
+  sidebar.classList.remove('open');
+  overlay.classList.remove('show');
+});
+
+const wcTime = document.getElementById('wc-time');
+function tick() { if (wcTime) wcTime.textContent = new Date().toLocaleTimeString('tr-TR'); }
+tick(); setInterval(tick, 1000);
+
+fetch('/api/stats').then(r => r.json()).then(d => {
+  if (d.ping !== undefined) document.getElementById('stat-ping').textContent = d.ping + ' ms';
+}).catch(() => {});
+
+document.querySelectorAll('.tilt').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width  - .5;
+    const y = (e.clientY - r.top)  / r.height - .5;
+    card.style.transform = `perspective(600px) rotateX(${-y*6}deg) rotateY(${x*6}deg) translateY(-2px)`;
+  });
+  card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+});
+
+document.getElementById('guardForm')?.addEventListener('submit', () => {
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Kaydediliyor…';
+});
+
+document.getElementById('dbResetBtn')?.addEventListener('click', async () => {
+  const confirmed = confirm(
+    '⚠️ Bu işlem GERİ ALINAMAZ!\n\n' +
+    'Tüm loglar, cezalar, uyarılar, whitelist, yedekler ve guard ayarları silinecek.\n\n' +
+    'Devam etmek istediğinizden emin misiniz?'
+  );
+  if (!confirmed) return;
+  const btn = document.getElementById('dbResetBtn');
+  btn.disabled = true;
+  btn.textContent = 'Sıfırlanıyor…';
+  try {
+    const res = await fetch('/api/db-reset', { method: 'POST' });
+    const data = await res.json();
+    if (data.ok) {
+      btn.textContent = '✓ Sıfırlandı';
+      btn.style.background = 'var(--green)';
+      btn.style.color = '#000';
+      setTimeout(() => location.reload(), 1500);
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Sıfırla';
+      alert('Hata: ' + (data.error || 'Bilinmeyen hata'));
+    }
+  } catch {
+    btn.disabled = false;
+    btn.textContent = 'Sıfırla';
+  }
+});
+
+(function () {
+  const inp = document.getElementById('wlInput');
+  const pre = document.getElementById('userPreview');
+  const btn = document.getElementById('wlBtn');
+  const err = document.getElementById('wlError');
+  if (!inp) return;
+  let t;
+  inp.addEventListener('input', function () {
+    clearTimeout(t);
+    const v = this.value.trim();
+    if (v.length < 15) { pre.style.display = 'none'; btn.disabled = true; err.style.display = 'none'; return; }
+    t = setTimeout(() => {
+      fetch('/api/user/' + v).then(r => r.json()).then(d => {
+        if (d.error) { pre.style.display = 'none'; btn.disabled = true; err.textContent = d.error; err.style.display = 'block'; return; }
+        document.getElementById('previewAvatar').src = d.avatar;
+        document.getElementById('previewTag').textContent  = d.tag;
+        document.getElementById('previewId').textContent   = d.id;
+        pre.style.display = 'flex'; btn.disabled = false; err.style.display = 'none';
+      }).catch(() => { pre.style.display = 'none'; btn.disabled = true; });
+    }, 600);
+  });
+})();
+</script>
+</body>
+</html>

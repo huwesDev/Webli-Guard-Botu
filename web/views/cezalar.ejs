@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cezalar — huw3s Guard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<%- include('partials/navbar') %>
+<div class="page-wrap">
+  <%- include('partials/sidebar', { active: 'cezalar' }) %>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <main class="dash-main">
+
+    <div class="page-header">
+      <div class="page-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Ceza Yönetimi
+      </div>
+      <div class="page-sub">Aktif jail listesi ve tüm ceza kayıtları</div>
+    </div>
+
+    <% if (jailedMembers && jailedMembers.length > 0) { %>
+      <div class="dc" style="margin-bottom:18px;border-color:rgba(255,119,51,.2)">
+        <div class="dc-head">
+          <div class="dc-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff7733" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Şu An Jail'de
+            <span class="badge badge-warn"><%= jailedMembers.length %></span>
+          </div>
+        </div>
+        <div class="dc-body" style="padding:14px">
+          <div class="card-list">
+            <% for (const m of jailedMembers) { %>
+              <div class="list-card">
+                <div class="list-card-avatar">
+                  <img src="<%= m.avatar %>" alt="">
+                </div>
+                <div class="list-card-body">
+                  <div class="list-card-title"><%= m.tag %></div>
+                  <div class="list-card-sub"><code><%= m.id %></code></div>
+                </div>
+                <div class="list-card-actions">
+                  <a href="/dashboard/ceza/<%= m.id %>" class="btn btn-ghost btn-sm">Geçmiş</a>
+                  <form action="/cezalar/unjail" method="POST">
+                    <input type="hidden" name="userId" value="<%= m.id %>">
+                    <button type="submit" class="btn btn-success btn-sm">Serbest Bırak</button>
+                  </form>
+                </div>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    <% } else { %>
+      <div class="dc" style="margin-bottom:18px">
+        <div class="dc-body" style="padding:16px 20px;display:flex;align-items:center;gap:10px;color:var(--green)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span style="font-size:13px;font-weight:600">Jail'de kimse yok</span>
+          <% if (!settings.jail_role) { %>
+            <span style="font-size:12px;color:var(--text2)">
+              — Jail rolü ayarlanmamış
+              (<a href="/settings">Ayarla</a>)
+            </span>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+
+    <div class="dc">
+      <div class="dc-head">
+        <div class="dc-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+          Tüm Ceza Kayıtları
+          <span class="badge badge-gray"><%= cezalar.length %></span>
+        </div>
+      </div>
+
+      <% if (!cezalar.length) { %>
+        <div class="dc-body">
+          <div class="empty-state" style="padding:60px">
+            <div class="empty-state-icon">✅</div>
+            <div class="empty-state-text">Henüz ceza kaydı yok.</div>
+          </div>
+        </div>
+      <% } else { %>
+        <div class="table-wrap" style="border:none;border-radius:0">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Kullanıcı</th>
+                <th>Tip</th>
+                <th>Sebep</th>
+                <th>Moderatör</th>
+                <th>Tarih</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% cezalar.forEach((c, i) => { %>
+                <tr>
+                  <td style="color:var(--text2);font-weight:700;width:40px"><%= i + 1 %></td>
+                  <td>
+                    <a href="/dashboard/ceza/<%= c.user_id %>"
+                       style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--p2)">
+                      <%= c.user_id %>
+                    </a>
+                  </td>
+                  <td>
+                    <span class="badge <%=
+                      c.tip === 'ban'  ? 'badge-danger' :
+                      c.tip === 'jail' ? 'badge-warn'   :
+                      c.tip === 'kick' ? 'badge-info'   :
+                      c.tip === 'mute' ? 'badge-purple'  : 'badge-gray'
+                    %>"><%= c.tip.toUpperCase() %></span>
+                  </td>
+                  <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--text)">
+                    <%= c.sebep %>
+                  </td>
+                  <td><code style="font-size:11px"><%= c.mod_id %></code></td>
+                  <td style="color:var(--text2);font-size:11px;white-space:nowrap">
+                    <%= new Date(c.tarih).toLocaleString('tr-TR') %>
+                  </td>
+                  <td>
+                    <form action="/cezalar/delete" method="POST">
+                      <input type="hidden" name="id" value="<%= c.id %>">
+                      <button type="submit" class="btn btn-danger btn-sm"
+                              onclick="return confirm('Bu kaydı silmek istediğinden emin misin?')">
+                        Sil
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav?.classList.toggle('scrolled', scrollY > 10), { passive: true });
+
+const overlay = document.getElementById('sidebarOverlay');
+const sidebar = document.getElementById('sidebar');
+document.getElementById('navMenuBtn')?.addEventListener('click', () => {
+  sidebar.classList.toggle('open'); overlay.classList.toggle('show');
+});
+overlay?.addEventListener('click', () => {
+  sidebar.classList.remove('open'); overlay.classList.remove('show');
+});
+</script>
+</body>
+</html>

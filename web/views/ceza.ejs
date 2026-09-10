@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ceza Geçmişi — huw3s Guard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<%- include('partials/navbar') %>
+<div class="page-wrap">
+  <%- include('partials/sidebar', { active: 'cezalar' }) %>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <main class="dash-main">
+
+    <div class="page-header">
+      <div class="page-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--p2)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Ceza Geçmişi
+      </div>
+      <div class="page-sub">
+        Kullanıcı:&nbsp;<code><%= userId %></code>
+        &nbsp;·&nbsp;
+        <span class="badge badge-<%= gecmis.length > 0 ? 'danger' : 'success' %>">
+          <%= gecmis.length %> kayıt
+        </span>
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <a href="/cezalar" class="btn btn-ghost btn-sm">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Ceza Listesine Dön
+      </a>
+    </div>
+
+    <% if (!gecmis.length) { %>
+      <div class="dc">
+        <div class="dc-body">
+          <div class="empty-state" style="padding:72px">
+            <div class="empty-state-icon">✅</div>
+            <div class="empty-state-text">Bu kullanıcıya ait ceza kaydı bulunmuyor.</div>
+          </div>
+        </div>
+      </div>
+    <% } else { %>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Tip</th>
+              <th>Sebep</th>
+              <th>Moderatör</th>
+              <th>Tarih</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% gecmis.forEach((c, i) => { %>
+              <tr>
+                <td style="color:var(--text2);font-weight:700;width:40px"><%= i + 1 %></td>
+                <td>
+                  <span class="badge <%=
+                    c.tip === 'ban'  ? 'badge-danger' :
+                    c.tip === 'jail' ? 'badge-warn'   :
+                    c.tip === 'kick' ? 'badge-info'   :
+                    c.tip === 'mute' ? 'badge-purple'  : 'badge-gray'
+                  %>"><%= c.tip.toUpperCase() %></span>
+                </td>
+                <td style="font-size:13px;color:var(--text)"><%= c.sebep %></td>
+                <td><code style="font-size:11px"><%= c.mod_id %></code></td>
+                <td style="color:var(--text2);font-size:12px;white-space:nowrap">
+                  <%= new Date(c.tarih).toLocaleString('tr-TR') %>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+
+  </main>
+</div>
+
+<script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav?.classList.toggle('scrolled', scrollY > 10), { passive: true });
+
+const overlay = document.getElementById('sidebarOverlay');
+const sidebar = document.getElementById('sidebar');
+document.getElementById('navMenuBtn')?.addEventListener('click', () => {
+  sidebar.classList.toggle('open'); overlay.classList.toggle('show');
+});
+overlay?.addEventListener('click', () => {
+  sidebar.classList.remove('open'); overlay.classList.remove('show');
+});
+</script>
+</body>
+</html>
