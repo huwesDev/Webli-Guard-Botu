@@ -20,14 +20,13 @@ module.exports = {
     const gun = interaction.options.getInteger('gun');
     updateSetting(interaction.guild.id, 'min_account_age', gun);
     updateSetting(interaction.guild.id, 'guard_hesap_yasi', gun > 0 ? 1 : 0);
-
     await interaction.reply({
       flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
       components: [
         new ContainerBuilder().setAccentColor(gun > 0 ? COLOR.success : COLOR.muted)
+          .addTextDisplayComponents(txt(`### 👶  Hesap Yaşı ${gun > 0 ? 'Aktif' : 'Kapatıldı'}`))
+          .addSeparatorComponents(sep())
           .addTextDisplayComponents(
-            txt(`### 👶  Hesap Yaşı ${gun > 0 ? 'Aktif' : 'Kapatıldı'}`),
-            sep(),
             txt(gun > 0
               ? `**Min. Yaş:** ${gun} gün\n**Durum:** ✅ Aktif\n\n${gun} günden genç hesaplar sunucuya katılamaz.`
               : '**Durum:** 🔴 Kapalı\nHesap yaşı kısıtlaması kaldırıldı.'
