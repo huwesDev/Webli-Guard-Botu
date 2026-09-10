@@ -1,9 +1,4 @@
-const {
-  SlashCommandBuilder,
-  PermissionFlagsBits,
-  ContainerBuilder,
-  MessageFlags,
-} = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, ContainerBuilder, MessageFlags } = require('discord.js');
 const { addLog } = require('../utils/db');
 const { COLOR, sep, txt, timestamp } = require('../utils/cv2');
 const { errContainer } = require('./ban');
@@ -19,7 +14,6 @@ module.exports = {
   async execute(interaction) {
     const userId = interaction.options.getString('id').trim();
     const sebep  = interaction.options.getString('sebep') || 'Sebep belirtilmedi';
-
     try {
       const ban = await interaction.guild.bans.fetch(userId).catch(() => null);
       if (!ban)
@@ -33,9 +27,9 @@ module.exports = {
         flags: MessageFlags.IsComponentsV2,
         components: [
           new ContainerBuilder().setAccentColor(COLOR.success)
+            .addTextDisplayComponents(txt('### ✅  Ban Kaldırıldı'))
+            .addSeparatorComponents(sep())
             .addTextDisplayComponents(
-              txt('### ✅  Ban Kaldırıldı'),
-              sep(),
               txt(`**Kullanıcı:** ${ban.user.tag} \`(${userId})\`\n**Yetkili:** ${interaction.user.tag}\n**Sebep:** ${sebep}`),
               txt(`-# ${timestamp()}`),
             ),
