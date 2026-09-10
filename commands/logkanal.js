@@ -22,9 +22,9 @@ module.exports = {
       flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
       components: [
         new ContainerBuilder().setAccentColor(COLOR.success)
+          .addTextDisplayComponents(txt('### 📋  Log Kanalı Ayarlandı'))
+          .addSeparatorComponents(sep())
           .addTextDisplayComponents(
-            txt('### 📋  Log Kanalı Ayarlandı'),
-            sep(),
             txt(`**Kanal:** <#${kanal.id}>\n**Yetkili:** ${interaction.user.tag}`),
             txt(`-# Guard olayları artık bu kanala gönderilecek  •  ${timestamp()}`),
           ),
