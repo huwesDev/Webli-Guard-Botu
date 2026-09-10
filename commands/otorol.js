@@ -1,9 +1,4 @@
-const {
-  SlashCommandBuilder,
-  PermissionFlagsBits,
-  ContainerBuilder,
-  MessageFlags,
-} = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, ContainerBuilder, MessageFlags } = require('discord.js');
 const { setOtorol, getOtorol, removeOtorol } = require('../utils/db');
 const { COLOR, sep, txt, timestamp } = require('../utils/cv2');
 
@@ -28,9 +23,9 @@ module.exports = {
         flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
         components: [
           new ContainerBuilder().setAccentColor(COLOR.success)
+            .addTextDisplayComponents(txt('### ⚙️  Otorol Ayarlandı'))
+            .addSeparatorComponents(sep())
             .addTextDisplayComponents(
-              txt('### ⚙️  Otorol Ayarlandı'),
-              sep(),
               txt(`**Rol:** <@&${rol.id}>\n**Yetkili:** ${interaction.user.tag}`),
               txt(`-# Sunucuya katılan her üyeye bu rol verilecek  •  ${timestamp()}`),
             ),
@@ -58,9 +53,9 @@ module.exports = {
         flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
         components: [
           new ContainerBuilder().setAccentColor(otorol ? COLOR.brand : COLOR.muted)
+            .addTextDisplayComponents(txt('### ⚙️  Otorol Bilgisi'))
+            .addSeparatorComponents(sep())
             .addTextDisplayComponents(
-              txt('### ⚙️  Otorol Bilgisi'),
-              sep(),
               txt(otorol
                 ? `**Aktif Rol:** <@&${otorol.rol_id}>\nSunucuya katılan her üyeye bu rol verilir.`
                 : '> Otorol ayarlanmamış.'
