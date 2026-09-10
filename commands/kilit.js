@@ -1,9 +1,4 @@
-const {
-  SlashCommandBuilder,
-  PermissionFlagsBits,
-  ContainerBuilder,
-  MessageFlags,
-} = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, ContainerBuilder, MessageFlags } = require('discord.js');
 const { COLOR, sep, txt, timestamp } = require('../utils/cv2');
 const { errContainer } = require('./ban');
 
@@ -24,36 +19,28 @@ module.exports = {
 
     try {
       if (sub === 'kapat') {
-        await channel.permissionOverwrites.edit(everyone,
-          { SendMessages: false },
-          { reason: `[huw3s Guard] ${sebep}` }
-        );
-
+        await channel.permissionOverwrites.edit(everyone, { SendMessages: false }, { reason: `[huw3s Guard] ${sebep}` });
         await interaction.reply({
           flags: MessageFlags.IsComponentsV2,
           components: [
             new ContainerBuilder().setAccentColor(COLOR.danger)
+              .addTextDisplayComponents(txt('### 🔒  Kanal Kilitlendi'))
+              .addSeparatorComponents(sep())
               .addTextDisplayComponents(
-                txt('### 🔒  Kanal Kilitlendi'),
-                sep(),
                 txt(`**Kanal:** <#${channel.id}>\n**Sebep:** ${sebep}\n**Yetkili:** ${interaction.user.tag}`),
                 txt(`-# ${timestamp()}`),
               ),
           ],
         });
       } else {
-        await channel.permissionOverwrites.edit(everyone,
-          { SendMessages: null },
-          { reason: '[huw3s Guard] Kilit kaldırıldı' }
-        );
-
+        await channel.permissionOverwrites.edit(everyone, { SendMessages: null }, { reason: '[huw3s Guard] Kilit kaldırıldı' });
         await interaction.reply({
           flags: MessageFlags.IsComponentsV2,
           components: [
             new ContainerBuilder().setAccentColor(COLOR.success)
+              .addTextDisplayComponents(txt('### 🔓  Kanal Açıldı'))
+              .addSeparatorComponents(sep())
               .addTextDisplayComponents(
-                txt('### 🔓  Kanal Açıldı'),
-                sep(),
                 txt(`**Kanal:** <#${channel.id}>\n**Yetkili:** ${interaction.user.tag}`),
                 txt(`-# ${timestamp()}`),
               ),
@@ -61,10 +48,7 @@ module.exports = {
         });
       }
     } catch (e) {
-      await interaction.reply({
-        flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
-        components: [errContainer(`Kilit işlemi başarısız: ${e.message}`)],
-      });
+      await interaction.reply({ flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral, components: [errContainer(`Kilit işlemi başarısız: ${e.message}`)] });
     }
   },
 };
