@@ -1,9 +1,4 @@
-const {
-  SlashCommandBuilder,
-  PermissionFlagsBits,
-  ContainerBuilder,
-  MessageFlags,
-} = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, ContainerBuilder, MessageFlags } = require('discord.js');
 const { getSettings, getLogStats, getAllCezalar, getWhitelist } = require('../utils/db');
 const { COLOR, sep, txt, timestamp } = require('../utils/cv2');
 
@@ -23,7 +18,6 @@ module.exports = {
 
   async execute(interaction) {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-
     const g       = interaction.guild;
     const guildId = g.id;
     const s       = getSettings(guildId);
@@ -37,47 +31,28 @@ module.exports = {
     const kicks = cezalar.filter(c => c.tip === 'kick').length;
     const mutes = cezalar.filter(c => c.tip === 'mute').length;
 
-    const card = new ContainerBuilder()
-      .setAccentColor(COLOR.guard)
-      .addTextDisplayComponents(
-        txt(`### 📊  huw3s Guard — İstatistikler`),
-        txt(`**${g.name}**  •  ${g.memberCount} üye`),
-      )
-      .addSeparatorComponents(sep(true))
-      .addTextDisplayComponents(
-        txt('**🛡️ Guard**'),
-        txt([
-          `Aktif Modül: **${aktif}** / ${GUARD_KEYS.length}`,
-          `Whitelist: **${wl.length}** kişi`,
-          `Bot Ping: **${interaction.client.ws.ping}ms**`,
-        ].join('\n')),
-      )
-      .addSeparatorComponents(sep())
-      .addTextDisplayComponents(
-        txt('**📋 Loglar**'),
-        txt([
-          `Toplam: **${stats.total}**`,
-          `Bugün: **${stats.bugun}**`,
-          `Bu Hafta: **${stats.hafta}**`,
-          `Guard Olayı: **${stats.guard}**`,
-        ].join('\n')),
-      )
-      .addSeparatorComponents(sep())
-      .addTextDisplayComponents(
-        txt('**⚖️ Cezalar**'),
-        txt([
-          `Ban: **${bans}**`,
-          `Jail: **${jails}**`,
-          `Kick: **${kicks}**`,
-          `Mute: **${mutes}**`,
-          `Toplam: **${cezalar.length}**`,
-        ].join('\n')),
-        txt(`-# ${timestamp()}`),
-      );
-
     await interaction.editReply({
       flags: MessageFlags.IsComponentsV2,
-      components: [card],
+      components: [
+        new ContainerBuilder().setAccentColor(COLOR.guard)
+          .addTextDisplayComponents(
+            txt(`### 📊  huw3s Guard — İstatistikler`),
+            txt(`**${g.name}**  •  ${g.memberCount} üye`),
+          )
+          .addSeparatorComponents(sep())
+          .addTextDisplayComponents(
+            txt(`**🛡️ Guard**\nAktif Modül: **${aktif}** / ${GUARD_KEYS.length}\nWhitelist: **${wl.length}** kişi\nBot Ping: **${interaction.client.ws.ping}ms**`),
+          )
+          .addSeparatorComponents(sep())
+          .addTextDisplayComponents(
+            txt(`**📋 Loglar**\nToplam: **${stats.total}**\nBugün: **${stats.bugun}**\nBu Hafta: **${stats.hafta}**\nGuard Olayı: **${stats.guard}**`),
+          )
+          .addSeparatorComponents(sep())
+          .addTextDisplayComponents(
+            txt(`**⚖️ Cezalar**\nBan: **${bans}**  •  Jail: **${jails}**  •  Kick: **${kicks}**  •  Mute: **${mutes}**  •  Toplam: **${cezalar.length}**`),
+            txt(`-# ${timestamp()}`),
+          ),
+      ],
     });
   },
 };
