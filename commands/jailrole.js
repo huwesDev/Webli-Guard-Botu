@@ -17,15 +17,14 @@ module.exports = {
   async execute(interaction) {
     const rol = interaction.options.getRole('rol');
     updateSetting(interaction.guild.id, 'jail_role', rol.id);
-
     await interaction.reply({
       flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
       components: [
         new ContainerBuilder().setAccentColor(COLOR.success)
+          .addTextDisplayComponents(txt('### ⛓️  Jail Rolü Ayarlandı'))
+          .addSeparatorComponents(sep())
           .addTextDisplayComponents(
-            txt('### ⛓️  Jail Rolü Ayarlandı'),
-            sep(),
-            txt(`**Rol:** <@&${rol.id}>\n**Yetki:** ${interaction.user.tag}`),
+            txt(`**Rol:** <@&${rol.id}>\n**Yetkili:** ${interaction.user.tag}`),
             txt(`-# Guard ceza sistemi bu rolü kullanacak  •  ${timestamp()}`),
           ),
       ],
