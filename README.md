@@ -53,7 +53,7 @@ https://discord.com/oauth2/authorize?client_id=CLIENT_ID&permissions=8&scope=bot
 
 ```bash
 # Repoyu klonlayın veya ZIP olarak indirin
-git clone https://github.com/kullanici/huwes-guard.git
+git clone https://github.com/huwesDev/huwes-guard.git
 cd huwes-guard
 
 # Bağımlılıkları yükleyin
